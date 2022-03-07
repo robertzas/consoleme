@@ -231,7 +231,7 @@ async def get_resource_account(arn: str) -> str:
     resource_info = await redis_hget(resources_from_aws_config_redis_key, arn)
     if resource_info:
         return json.loads(resource_info).get("accountId", "")
-    elif "arn:aws:s3:::" in arn:
+    elif "arn:{config.partition}:s3:::" in arn:
         # Try to retrieve S3 bucket information from S3 cache. This is inefficient and we should ideally have
         # retrieved this info from our AWS Config cache, but we've encountered problems with AWS Config historically
         # that have necessitated this code.
@@ -352,7 +352,7 @@ async def fetch_managed_policy_details(
 
     if path:
         resource_name = path + "/" + resource_name
-    policy_arn: str = f"arn:aws:iam::{account_id}:policy/{resource_name}"
+    policy_arn: str = f"arn:{config.partition}:iam::{account_id}:policy/{resource_name}"
     result: Dict = {}
     result["Policy"] = await sync_to_async(get_managed_policy_document)(
         policy_arn=policy_arn,
@@ -407,7 +407,7 @@ async def fetch_sns_topic(account_id: str, region: str, resource_name: str) -> d
             f"Region '{region}' is not valid region on account '{account_id}'."
         )
 
-    arn: str = f"arn:aws:sns:{region}:{account_id}:{resource_name}"
+    arn: str = f"arn:{config.partition}:sns:{region}:{account_id}:{resource_name}"
     client = await sync_to_async(boto3_cached_conn)(
         "sns",
         account_number=account_id,
@@ -706,7 +706,7 @@ def apply_managed_policy_to_role(
         "session_name": session_name,
     }
     account_id = role.get("Arn").split(":")[4]
-    policy_arn = f"arn:aws:iam::{account_id}:policy/{policy_name}"
+    policy_arn = f"arn:{config.partition}:iam::{account_id}:policy/{policy_name}"
     client = boto3_cached_conn(
         "iam",
         account_number=account_id,
@@ -967,7 +967,7 @@ async def create_iam_role(create_model: RoleCreationRequestModel, username):
         results["action_results"].append(
             {
                 "status": "success",
-                "message": f"Role arn:aws:iam::{create_model.account_id}:role/{create_model.role_name} "
+                "message": f"Role arn:{config.partition}:iam::{create_model.account_id}:role/{create_model.role_name} "
                 f"successfully created",
             }
         )
@@ -1043,9 +1043,7 @@ async def create_iam_role(create_model: RoleCreationRequestModel, username):
     # Force caching of role
     try:
         aws = get_plugin_by_name(config.get("plugins.aws", "default_aws"))()
-        role_arn = (
-            f"arn:aws:iam::{create_model.account_id}:role/{create_model.role_name}"
-        )
+        role_arn = f"arn:{config.partition}:iam::{create_model.account_id}:role/{create_model.role_name}"
         await aws.fetch_iam_role(create_model.account_id, role_arn, force_refresh=True)
     except Exception as e:
         log.error({**log_data, "message": "Unable to cache role", "error": str(e)})
@@ -1140,7 +1138,7 @@ async def clone_iam_role(clone_model: CloneRoleRequestModel, username):
         results["action_results"].append(
             {
                 "status": "success",
-                "message": f"Role arn:aws:iam::{clone_model.dest_account_id}:role/{clone_model.dest_role_name} "
+                "message": f"Role arn:{config.partition}:iam::{clone_model.dest_account_id}:role/{clone_model.dest_role_name} "
                 f"successfully created",
             }
         )
@@ -1992,7 +1990,7 @@ async def resource_arn_known_in_aws_config(
     :return:
     """
     known_arn = False
-    if not resource_arn.startswith("arn:aws:"):
+    if not resource_arn.startswith("arn:{config.partition}:"):
         return known_arn
 
     resources_from_aws_config_redis_key: str = config.get(

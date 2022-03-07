@@ -32,8 +32,8 @@ class ManagedPoliciesOnPrincipalHandler(BaseAPIV2Handler):
                 raise MustBeFte("Only FTEs are authorized to view this page.")
 
         errors = []
-        if not arn.startswith("arn:aws:iam::"):
-            errors.append("ARN must start with 'arn:aws:iam::'")
+        if not arn.startswith("arn:{config.partition}:iam::"):
+            errors.append("ARN must start with 'arn:{config.partition}:iam::'")
 
         principal_name = tornado.escape.xhtml_escape(arn.split("/")[-1])
         principal_type = tornado.escape.xhtml_escape(arn.split(":")[5].split("/")[0])

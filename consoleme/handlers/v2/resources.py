@@ -47,15 +47,15 @@ class ResourceDetailHandler(BaseAPIV2Handler):
         account_id_for_arn: str = account_id
         if resource_type == "s3":
             account_id_for_arn = ""
-        arn = f"arn:aws:{resource_type}:{region or ''}:{account_id_for_arn}:{resource_name}"
+        arn = f"arn:{config.partition}:{resource_type}:{region or ''}:{account_id_for_arn}:{resource_name}"
         path = ""
         if resource_type == "managed_policy":
             # special case for managed policies
             path = region or ""
             if path:
-                arn = f"arn:aws:iam::{account_id}:policy/{path}/{resource_name}"
+                arn = f"arn:{config.partition}:iam::{account_id}:policy/{path}/{resource_name}"
             else:
-                arn = f"arn:aws:iam::{account_id}:policy/{resource_name}"
+                arn = f"arn:{config.partition}:iam::{account_id}:policy/{resource_name}"
 
         stats.count(
             "ResourcePolicyEditHandler.get", tags={"user": self.user, "arn": arn}

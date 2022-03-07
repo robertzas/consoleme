@@ -278,7 +278,9 @@ class GetCredentialsHandler(BaseMtlsHandler):
             # Shove the account ID into the request:
             request["account_id"] = account_id
 
-            return f"arn:aws:iam::{account_id}:role/{self.user_role_name}"
+            return (
+                f"arn:{config.partition}:iam::{account_id}:role/{self.user_role_name}"
+            )
 
     async def post(self):
         """/api/v1/get_credentials - Endpoint used to get credentials via mtls. Used by newt and weep.
@@ -508,7 +510,9 @@ class GetCredentialsHandler(BaseMtlsHandler):
                 ):
                     user_role = True
                     account_id = (
-                        matching_roles[0].split("arn:aws:iam::")[1].split(":role")[0]
+                        matching_roles[0]
+                        .split("arn:{config.partition}:iam::")[1]
+                        .split(":role")[0]
                     )
 
                 credentials = await aws.get_credentials(

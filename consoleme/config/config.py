@@ -383,6 +383,11 @@ class Configuration(object):
             if region:
                 return region
 
+    def get_aws_partition(self, region):
+        if "gov" in region:
+            return "aws-us-gov"
+        return "aws"
+
 
 class ContextFilter(logging.Filter):
     """Logging Filter for adding hostname to log entries."""
@@ -405,6 +410,7 @@ CONFIG.set_logging_levels()
 
 values = CONFIG.config
 region = CONFIG.get_aws_region()
+partition = CONFIG.get_aws_partition(region)
 hostname = socket.gethostname()
 api_spec = {}
 dir_ref = dir

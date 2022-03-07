@@ -117,7 +117,7 @@ permissions_map:
         type: text_input
         text: EC2 resource you need access to
         required: true
-        default: "arn:aws:iam::{account_id}:role/rds-monitoring-role"
+        default: "arn:{config.partition}:iam::{account_id}:role/rds-monitoring-role"
     action_map:
       - name: passrole
         text: PassRole
@@ -273,8 +273,8 @@ PERMISSION_TEMPLATE_DEFAULTS = yaml.safe_load(
                 ],
                 "Effect":"Allow",
                 "Resource":[
-                    "arn:aws:s3:::BUCKET_NAME",
-                    "arn:aws:s3:::BUCKET_NAME/OPTIONAL_PREFIX/*"
+                    "arn:{config.partition}:s3:::BUCKET_NAME",
+                    "arn:{config.partition}:s3:::BUCKET_NAME/OPTIONAL_PREFIX/*"
                 ],
                 "Sid":"s3readwrite"
             }
@@ -292,8 +292,8 @@ PERMISSION_TEMPLATE_DEFAULTS = yaml.safe_load(
                 ],
                 "Effect":"Allow",
                 "Resource":[
-                    "arn:aws:s3:::BUCKET_NAME",
-                    "arn:aws:s3:::BUCKET_NAME/OPTIONAL_PREFIX/*"
+                    "arn:{config.partition}:s3:::BUCKET_NAME",
+                    "arn:{config.partition}:s3:::BUCKET_NAME/OPTIONAL_PREFIX/*"
                 ],
                 "Sid":"s3readonly"
             }

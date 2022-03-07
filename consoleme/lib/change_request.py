@@ -209,8 +209,8 @@ async def _generate_s3_inline_policy_statement_from_mapping(
         generator.resource_arn = [generator.resource_arn]
     # Handle the bucket ARNs
     for arn in generator.resource_arn:
-        if not arn.startswith("arn:aws:s3:::"):
-            arn = f"arn:aws:s3:::{arn}"
+        if not arn.startswith(f"arn:{config.partition}:s3:::"):
+            arn = f"arn:{config.partition}:s3:::{arn}"
         resource_arns.append(arn)
 
         # Make sure prefix starts with "/"

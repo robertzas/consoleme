@@ -155,7 +155,9 @@ class RoleConsoleLoginHandler(BaseAPIV2Handler):
                 and selected_role.split("role/")[1] == self.user_role_name
             ):
                 user_role = True
-                account_id = selected_role.split("arn:aws:iam::")[1].split(":role")[0]
+                account_id = selected_role.split("arn:{config.partition}:iam::")[
+                    1
+                ].split(":role")[0]
 
             url = await aws.generate_url(
                 self.user,
@@ -440,7 +442,7 @@ class RoleDetailHandler(BaseAPIV2Handler):
             return
 
         # if here, role has been successfully deleted
-        arn = f"arn:aws:iam::{account_id}:role/{role_name}"
+        arn = f"arn:{config.partition}:iam::{account_id}:role/{role_name}"
         await aws.fetch_iam_role(account_id, arn, force_refresh=True)
         response_json = {
             "status": "success",
@@ -521,7 +523,7 @@ class RoleDetailAppHandler(BaseMtlsHandler):
             return
 
         # if here, role has been successfully deleted
-        arn = f"arn:aws:iam::{account_id}:role/{role_name}"
+        arn = f"arn:{config.partition}:iam::{account_id}:role/{role_name}"
         await aws.fetch_iam_role(account_id, arn, force_refresh=True)
         response_json = {
             "status": "success",

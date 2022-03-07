@@ -649,7 +649,7 @@ def cache_policies_table_details() -> bool:
                 buckets = json.loads(red.hget(s3_bucket_key, account))
 
                 for bucket in buckets:
-                    bucket_arn = f"arn:aws:s3:::{bucket}"
+                    bucket_arn = f"arn:{config.partition}:s3:::{bucket}"
                     s3_errors_for_arn = s3_errors.get(bucket_arn, [])
 
                     error_count = 0
@@ -659,7 +659,7 @@ def cache_policies_table_details() -> bool:
                         {
                             "account_id": account,
                             "account_name": account_name,
-                            "arn": f"arn:aws:s3:::{bucket}",
+                            "arn": f"arn:{config.partition}:s3:::{bucket}",
                             "technology": "AWS::S3::Bucket",
                             "templated": None,
                             "errors": error_count,
@@ -1486,7 +1486,7 @@ def cache_sqs_queues_for_account(account_id: str) -> Dict[str, Union[str, int]]:
 
             for res in response_iterator:
                 for queue in res.get("QueueUrls", []):
-                    arn = f"arn:aws:sqs:{region}:{account_id}:{queue.split('/')[4]}"
+                    arn = f"arn:{config.partition}:sqs:{region}:{account_id}:{queue.split('/')[4]}"
                     all_queues.add(arn)
         except Exception as e:
             log.error(

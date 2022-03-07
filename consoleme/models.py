@@ -80,11 +80,11 @@ class PrincipalModel(BaseModel):
 class AwsResourcePrincipalModel(PrincipalModel):
     principal_type: constr(regex=r"AwsResource")
     principal_arn: constr(
-        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$)|^\*$"
+        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$)|^\*$"
     ) = Field(
         ...,
         description="The principal (Source ARN) associated with the Change. This is most commomly an IAM role ARN.\nThe principal ARN is associated with the entity whose policy will be modified if the change is\napproved and successful.",
-        example="arn:aws:iam::123456789012:role/exampleRole",
+        example="arn:aws-us-gov:iam::123456789012:role/exampleRole",
     )
 
 
@@ -165,7 +165,7 @@ class ResourceTagChangeModel(ChangeModel):
 
 class ManagedPolicyChangeModel(ChangeModel):
     arn: constr(
-        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$)|^\*$"
+        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$)|^\*$"
     )
     change_type: Optional[constr(regex=r"managed_policy")] = None
     action: Action
@@ -173,7 +173,7 @@ class ManagedPolicyChangeModel(ChangeModel):
 
 class PermissionsBoundaryChangeModel(ChangeModel):
     arn: constr(
-        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$)|^\*$"
+        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$)|^\*$"
     )
     change_type: Optional[constr(regex=r"permissions_boundary")] = None
     action: Action
@@ -182,7 +182,7 @@ class PermissionsBoundaryChangeModel(ChangeModel):
 class ArnArray(BaseModel):
     __root__: List[
         constr(
-            regex=r"^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$"
+            regex=r"^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$"
         )
     ]
 
@@ -246,15 +246,15 @@ class AwsPrincipalModel(BaseModel):
     account_name: Optional[str] = Field(None, example="super_awesome")
     arn: Optional[
         constr(
-            regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$)|^\*$"
+            regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$)|^\*$"
         )
-    ] = Field(None, example="arn:aws:iam::123456789012:role/super_awesome_admin")
+    ] = Field(None, example="arn:aws-us-gov:iam::123456789012:role/super_awesome_admin")
 
 
 class CloudTrailError(BaseModel):
     event_call: Optional[str] = Field(None, example="sqs:CreateQueue")
     resource: Optional[str] = Field(
-        None, example="arn:aws:iam::123456789012:role/roleName"
+        None, example="arn:aws-us-gov:iam::123456789012:role/roleName"
     )
     generated_policy: Optional[Dict[str, Any]] = Field(
         None,
@@ -262,7 +262,7 @@ class CloudTrailError(BaseModel):
             "Version": "2012-10-17",
             "Statement": [
                 {
-                    "Resource": ["arn:aws:iam::123456789012:role/roleName"],
+                    "Resource": ["arn:aws-us-gov:iam::123456789012:role/roleName"],
                     "Action": ["sts:AssumeRole"],
                     "Effect": "Allow",
                 }
@@ -292,9 +292,9 @@ class S3Error(BaseModel):
     status_text: Optional[str] = Field(None, example="AccessDenied")
     role_arn: Optional[
         constr(
-            regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$)|^\*$"
+            regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$)|^\*$"
         )
-    ] = Field(None, example="arn:aws:iam::123456789012:role/roleName")
+    ] = Field(None, example="arn:aws-us-gov:iam::123456789012:role/roleName")
 
 
 class S3ErrorArray(BaseModel):
@@ -609,8 +609,8 @@ class ChangeGeneratorModel(BaseModel):
         None,
         description="The ARN(s) of the resource being accessed. This is often SQS/SNS/S3/etc. ARNs. It is possible that the\nresource policies will need to be modified if the change is approved and successful.",
         example=[
-            "arn:aws:sqs:us-east-1:123456789012:sqs_queue,",
-            "arn:aws:sqs:us-west-2:123456789012:sqs_queue2,",
+            "arn:aws-us-gov:sqs:us-east-1:123456789012:sqs_queue,",
+            "arn:aws-us-gov:sqs:us-west-2:123456789012:sqs_queue2,",
         ],
     )
     version: Optional[str] = Field(2.0, description="Version")
@@ -627,14 +627,14 @@ class ChangeGeneratorModel(BaseModel):
     condition: Optional[Dict[str, Any]] = Field(
         None,
         description="Optional condition for the change",
-        example='{\n    "StringEquals": {"iam:PassedToService": "ec2.amazonaws.com"},\n    "StringLike": {\n        "iam:AssociatedResourceARN": [\n            "arn:aws:ec2:us-east-1:111122223333:instance/*",\n            "arn:aws:ec2:us-west-1:111122223333:instance/*"\n        ]\n    }\n}',
+        example='{\n    "StringEquals": {"iam:PassedToService": "ec2.amazonaws.com"},\n    "StringLike": {\n        "iam:AssociatedResourceARN": [\n            "arn:aws-us-gov:ec2:us-east-1:111122223333:instance/*",\n            "arn:aws-us-gov:ec2:us-west-1:111122223333:instance/*"\n        ]\n    }\n}',
     )
     service: Optional[str] = None
     bucket_prefix: Optional[str] = None
     policy: Optional[Dict[str, Any]] = Field(
         None,
         description="Optional full policy statement provided by frontend",
-        example='{\n  "Version": "2012-10-17",\n  "Statement": [\n      {\n          "Action": [\n              "s3:GetObject",\n          "Effect": "Allow",\n          "Resource": [\n              "arn:aws:s3:::abc",\n              "arn:aws:s3:::abc/*"\n          ],\n      }\n  ]\n}',
+        example='{\n  "Version": "2012-10-17",\n  "Statement": [\n      {\n          "Action": [\n              "s3:GetObject",\n          "Effect": "Allow",\n          "Resource": [\n              "arn:aws-us-gov:s3:::abc",\n              "arn:aws-us-gov:s3:::abc/*"\n          ],\n      }\n  ]\n}',
     )
     include_accounts: Optional[List[str]] = Field(
         None,
@@ -669,7 +669,7 @@ class GenericChangeGeneratorModel(ChangeGeneratorModel):
     resource_arn: Union[str, List[str]] = Field(
         ...,
         description="The ARN(s) of the resource being accessed. This is often SQS/SNS/S3/etc. ARNs. It is possible that the\nresource policies will need to be modified if the change is approved and successful.",
-        example=["arn:aws:sqs:us-east-1:123456789012:sqs_queue"],
+        example=["arn:aws-us-gov:sqs:us-east-1:123456789012:sqs_queue"],
     )
 
 
@@ -684,7 +684,7 @@ class S3ChangeGeneratorModel(ChangeGeneratorModel):
     resource_arn: Union[str, List[str]] = Field(
         ...,
         description="The ARN(s) of the S3 resource(s) being accessed.",
-        example=["arn:aws:s3:::example_bucket"],
+        example=["arn:aws-us-gov:s3:::example_bucket"],
     )
     bucket_prefix: str = Field(..., example="/awesome/prefix/*")
     action_groups: List[str]
@@ -733,7 +733,7 @@ class AssumeRolePolicyChangeModel(ChangeModel):
 class ResourcePolicyChangeModel(ChangeModel):
     change_type: Optional[constr(regex=r"resource_policy|sts_resource_policy")] = None
     arn: constr(
-        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws):(.+)$)|^\*$"
+        regex=r"(^arn:([^:]*):([^:]*):([^:]*):(|\*|[\d]{12}|cloudfront|aws|aws-us-gov):(.+)$)|^\*$"
     )
     source_change_id: Optional[str] = Field(
         None,

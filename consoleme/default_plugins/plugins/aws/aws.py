@@ -515,7 +515,7 @@ class Aws:
                                     },
                                     StringNotLike={
                                         "aws:PrincipalArn": [
-                                            "arn:aws:iam::*:role/aws:*"
+                                            "arn:{config.partition}:iam::*:role/aws:*"
                                         ]
                                     },
                                 ),
@@ -560,7 +560,7 @@ class Aws:
                                     },
                                     StringNotLike={
                                         "aws:PrincipalArn": [
-                                            "arn:aws:iam::*:role/aws:*"
+                                            "arn:{config.partition}:iam::*:role/aws:*"
                                         ]
                                     },
                                 ),
