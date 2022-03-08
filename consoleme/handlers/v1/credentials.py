@@ -511,7 +511,7 @@ class GetCredentialsHandler(BaseMtlsHandler):
                     user_role = True
                     account_id = (
                         matching_roles[0]
-                        .split("arn:{config.partition}:iam::")[1]
+                        .split(f"arn:{config.partition}:iam::")[1]
                         .split(":role")[0]
                     )
 

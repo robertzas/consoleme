@@ -231,7 +231,7 @@ async def get_resource_account(arn: str) -> str:
     resource_info = await redis_hget(resources_from_aws_config_redis_key, arn)
     if resource_info:
         return json.loads(resource_info).get("accountId", "")
-    elif "arn:{config.partition}:s3:::" in arn:
+    elif f"arn:{config.partition}:s3:::" in arn:
         # Try to retrieve S3 bucket information from S3 cache. This is inefficient and we should ideally have
         # retrieved this info from our AWS Config cache, but we've encountered problems with AWS Config historically
         # that have necessitated this code.
@@ -1990,7 +1990,7 @@ async def resource_arn_known_in_aws_config(
     :return:
     """
     known_arn = False
-    if not resource_arn.startswith("arn:{config.partition}:"):
+    if not resource_arn.startswith(f"arn:{config.partition}:"):
         return known_arn
 
     resources_from_aws_config_redis_key: str = config.get(

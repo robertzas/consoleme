@@ -155,7 +155,7 @@ class RoleConsoleLoginHandler(BaseAPIV2Handler):
                 and selected_role.split("role/")[1] == self.user_role_name
             ):
                 user_role = True
-                account_id = selected_role.split("arn:{config.partition}:iam::")[
+                account_id = selected_role.split(f"arn:{config.partition}:iam::")[
                     1
                 ].split(":role")[0]
 

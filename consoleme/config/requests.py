@@ -2410,7 +2410,7 @@ async def maybe_approve_reject_request(
         account_id = await get_resource_account(
             extended_request.principal.principal_arn
         )
-        if extended_request.principal.principal_arn.startswith("{config.partition}:{config.partition}:iam::"):
+        if extended_request.principal.principal_arn.startswith("arn:{config.partition}:iam::"):
             await aws.fetch_iam_role(
                 account_id, extended_request.principal.principal_arn, force_refresh=True
             )
@@ -2587,7 +2587,7 @@ async def parse_and_apply_policy_request_modification(
                 specific_change.policy.policy_document = (
                     apply_change_model.policy_document
                 )
-            managed_policy_arn_regex = re.compile(r"^arn:{config.partition}:iam::\d{12}:policy/.+")
+            managed_policy_arn_regex = re.compile(r"^arn:" + config.partition + ":iam::\d{12}:policy/.+")
             if (
                 specific_change.change_type == "resource_policy"
                 or specific_change.change_type == "sts_resource_policy"
@@ -2598,7 +2598,7 @@ async def parse_and_apply_policy_request_modification(
             elif (
                 specific_change.change_type == "resource_tag"
                 and not specific_change.principal.principal_arn.startswith(
-                    "arn:{config.partition}:iam::"
+                    f"arn:{config.partition}:iam::"
                 )
             ):
                 response = await apply_non_iam_resource_tag_change(
