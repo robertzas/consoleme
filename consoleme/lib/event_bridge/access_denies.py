@@ -43,7 +43,7 @@ async def get_resource_from_cloudtrail_deny(ct_event, raw_ct_event):
 
     if "on resource: arn:aws" in ct_event.get("error_message", ""):
         resource_re = re.match(
-            r"^.* on resource: (arn:aws:.*?$)", ct_event["error_message"]
+            r"^.* on resource: (arn:"+ config.partition +":.*?$)", ct_event["error_message"]
         )
         if resource_re and len(resource_re.groups()) == 1:
             resource = resource_re.groups()[0]

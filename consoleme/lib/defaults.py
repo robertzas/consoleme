@@ -343,7 +343,7 @@ PERMISSION_TEMPLATE_DEFAULTS = yaml.safe_load(
             "iam:PassRole"
           ],
           "Effect": "Allow",
-          "Resource": "arn:aws:iam::<ACCOUNTID>:role/rds-monitoring-role"
+          "Resource": "arn:{config.partition}:iam::<ACCOUNTID>:role/rds-monitoring-role"
         }
       ]
     }
@@ -358,7 +358,7 @@ PERMISSION_TEMPLATE_DEFAULTS = yaml.safe_load(
                     "ses:SendRawEmail"
                 ],
                 "Effect": "Allow",
-                "Resource": "arn:aws:ses:*:123456789012:identity/example.com",
+                "Resource": "arn:{config.partition}:ses:*:123456789012:identity/example.com",
                 "Condition": {
                     "StringLike": {
                         "ses:FromAddress": "SENDER@example.com"
@@ -377,7 +377,7 @@ PERMISSION_TEMPLATE_DEFAULTS = yaml.safe_load(
                     "sts:AssumeRole"
                 ],
                 "Effect": "Allow",
-                "Resource": "arn:aws:iam::ACCOUNT_NUMBER:role/ROLE"
+                "Resource": "arn:{config.partition}:iam::ACCOUNT_NUMBER:role/ROLE"
             }
         ]
     }
@@ -509,7 +509,7 @@ PERMISSION_TEMPLATE_DEFAULTS = yaml.safe_load(
                 ],
                 "Effect": "Allow",
                 "Resource": [
-                    "arn:aws:ec2:REGION:ACCOUNT_NUMBER:security-group/SECURITY_GROUP_ID"
+                    "arn:{config.partition}:ec2:REGION:ACCOUNT_NUMBER:security-group/SECURITY_GROUP_ID"
                 ],
                 "Sid": "sgmutate"
             },

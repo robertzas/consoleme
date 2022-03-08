@@ -85,7 +85,7 @@ async def get_s3_details_for_role(account_id: str, role_name: str) -> S3DetailsM
     :param arn:
     :return:
     """
-    arn = f"arn:aws:iam::{account_id}:role/{role_name}"
+    arn = f"arn:{config.partition}:iam::{account_id}:role/{role_name}"
     yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y%m%d")
     error_url = config.get("s3.query_url", "").format(
         yesterday=yesterday, role_name=f"'{role_name}'", account_id=f"'{account_id}'"
@@ -139,7 +139,7 @@ async def get_user_details(
     account_id: str, user_name: str, extended: bool = False, force_refresh: bool = False
 ) -> Optional[Union[ExtendedAwsPrincipalModel, AwsPrincipalModel]]:
     account_ids_to_name = await get_account_id_to_name_mapping()
-    arn = f"arn:aws:iam::{account_id}:user/{user_name}"
+    arn = f"arn:{config.partition}:iam::{account_id}:user/{user_name}"
     user = await aws.fetch_iam_user(account_id, arn)
     # requested user doesn't exist
     if not user:
@@ -183,7 +183,7 @@ async def get_role_details(
     account_id: str, role_name: str, extended: bool = False, force_refresh: bool = False
 ) -> Optional[Union[ExtendedAwsPrincipalModel, AwsPrincipalModel]]:
     account_ids_to_name = await get_account_id_to_name_mapping()
-    arn = f"arn:aws:iam::{account_id}:role/{role_name}"
+    arn = f"arn:{config.partition}:iam::{account_id}:role/{role_name}"
     role = await aws.fetch_iam_role(account_id, arn, force_refresh=force_refresh)
     # requested role doesn't exist
     if not role:

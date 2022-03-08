@@ -81,7 +81,7 @@ def detect_role_changes_and_update_cache(celery_app):
                 role_account_id = decoded_message.get(
                     "account", decoded_message.get("recipientAccountId")
                 )
-                role_arn = f"arn:aws:iam::{role_account_id}:role/{role_name}"
+                role_arn = f"arn:{config.partition}:iam::{role_account_id}:role/{role_name}"
 
                 if role_arn not in roles_to_update:
                     celery_app.send_task(

@@ -69,7 +69,7 @@ def auto_split(s: str) -> List[str]:
 
 def is_valid_role_arn(arn: str) -> bool:
     # This is valid enough as far as we are concerned.
-    if not arn.startswith("arn:aws:iam::"):
+    if not arn.startswith(f"arn:{config.partition}:iam::"):
         return False
     return True
 

@@ -2410,7 +2410,7 @@ async def maybe_approve_reject_request(
         account_id = await get_resource_account(
             extended_request.principal.principal_arn
         )
-        if extended_request.principal.principal_arn.startswith("aws:aws:iam::"):
+        if extended_request.principal.principal_arn.startswith("arn:{config.partition}:iam::"):
             await aws.fetch_iam_role(
                 account_id, extended_request.principal.principal_arn, force_refresh=True
             )
@@ -2587,7 +2587,7 @@ async def parse_and_apply_policy_request_modification(
                 specific_change.policy.policy_document = (
                     apply_change_model.policy_document
                 )
-            managed_policy_arn_regex = re.compile(r"^arn:aws:iam::\d{12}:policy/.+")
+            managed_policy_arn_regex = re.compile(r"^arn:" + config.partition + ":iam::\d{12}:policy/.+")
             if (
                 specific_change.change_type == "resource_policy"
                 or specific_change.change_type == "sts_resource_policy"
@@ -2598,7 +2598,7 @@ async def parse_and_apply_policy_request_modification(
             elif (
                 specific_change.change_type == "resource_tag"
                 and not specific_change.principal.principal_arn.startswith(
-                    "arn:aws:iam::"
+                    "arn:{config.partition}:iam::"
                 )
             ):
                 response = await apply_non_iam_resource_tag_change(
@@ -2804,7 +2804,7 @@ async def get_resources_from_policy_change(change: ChangeModel):
     {
         "resource_name": {
             "actions": ["service1:action1", "service2:action2"],
-            "arns": ["arn:aws:service1:::resource_name", "arn:aws:service1:::resource_name/*"],
+            "arns": ["arn:{config.partition}:service1:::resource_name", "arn:{config.partition}:service1:::resource_name/*"],
             "account": "1234567890",
             "type": "service1",
             "region": "",
